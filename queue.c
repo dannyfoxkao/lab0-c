@@ -154,22 +154,26 @@ err0:
 bool q_remove_head(queue_t *q, char *sp, size_t bufsize)
 {
     list_ele_t *rmvh;
+    size_t val_size;
 
     if (!q || !q->head)
         goto err0;
 
-    bufsize = strlen(q->head->value) + 1;
-    memcpy(sp, q->head->value, bufsize);
+    if (bufsize > (strlen(q->head->value) + 1))
+        val_size = strlen(q->head->value) + 1;
+    else
+        val_size = bufsize;
 
-    memset(q->head->value, 0, bufsize);
+    memcpy(sp, q->head->value, val_size);
+    sp[val_size - 1] = '\0';
+    memset(q->head->value, 0, strlen(q->head->value) + 1);
 
     rmvh = q->head;
     q->head = q->head->next;
     free(rmvh->value);
     free(rmvh);
     q->size--;
-    //	if(!q->head)i
-    //		free(q);
+
     return true;
 
 err0:
