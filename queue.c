@@ -27,6 +27,18 @@ void q_free(queue_t *q)
 {
     /* TODO: How about freeing the list elements and the strings? */
     /* Free queue structure */
+    list_ele_t *tmp = q->head;
+    if (!q)
+        return;
+
+    while (q->head) {
+        q->head = q->head->next;
+        memset(tmp->value, 0, strlen(tmp->value) + 1);
+        free(tmp->value);
+        free(tmp);
+        tmp = q->head;
+    }
+
     free(q);
 }
 
@@ -144,6 +156,7 @@ bool q_remove_head(queue_t *q, char *sp, size_t bufsize)
     if (!q || !q->head)
         goto err0;
 
+    // printf("%s\n",__func__);
     bufsize = strlen(q->head->value) + 1;
     memcpy(sp, q->head->value, bufsize);
 
@@ -209,8 +222,61 @@ void q_reverse(queue_t *q)
  * No effect if q is NULL or empty. In addition, if q has only one
  * element, do nothing.
  */
+void merge_sort(list_ele_t **head)
+{
+    list_ele_t *left = NULL;
+    list_ele_t *right = NULL;
+
+    if (!(*head) || !(*head)->next) {
+        return;
+    }
+
+    left = *head;
+    right = (*head)->next;
+
+    /*split list into two part*/
+    while (right && right->next) {
+        left = left->next;
+        right = right->next->next;
+    }
+
+    right = left->next;
+    left->next = NULL;
+    left = *head;
+
+    /*break down list to only one element*/
+    merge_sort(&left);
+    merge_sort(&right);
+
+    /*start to merge*/
+    *head = NULL;
+    list_ele_t **tmp = head;
+
+    while (right && left) {
+        if (strcmp(left->value, right->value) < 0) {
+            *tmp = left;
+            left = left->next;
+        } else {
+            *tmp = right;
+            right = right->next;
+        }
+        tmp = &((*tmp)->next);
+    }
+    *tmp = right ? right : left;
+}
+
+
 void q_sort(queue_t *q)
 {
     /* TODO: You need to write the code for this function */
     /* TODO: Remove the above comment when you are about to implement. */
+    if (q->size < 1) {
+        printf("q size <1\n");
+        return;
+    }
+    merge_sort(&q->head);
+
+    while (q->tail->next) {
+        q->tail = q->tail->next;
+    }
 }
