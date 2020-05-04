@@ -186,6 +186,9 @@ err0:
  */
 int q_size(queue_t *q)
 {
+    if (!q)
+        return 0;
+
     return q->size;
 }
 
@@ -275,10 +278,12 @@ void q_sort(queue_t *q)
 {
     /* TODO: You need to write the code for this function */
     /* TODO: Remove the above comment when you are about to implement. */
-    if (q->size < 1) {
-        printf("q size <1\n");
+    if (!q)
         return;
-    }
+
+    if (q->size < 1)
+        return;
+
     merge_sort(&q->head);
 
     while (q->tail->next) {
