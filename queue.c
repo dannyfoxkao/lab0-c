@@ -159,13 +159,17 @@ bool q_remove_head(queue_t *q, char *sp, size_t bufsize)
     if (!q || !q->head)
         goto err0;
 
-    if (bufsize > (strlen(q->head->value) + 1))
+    if (bufsize > (strlen(q->head->value) + 1) || bufsize == 0)
         val_size = strlen(q->head->value) + 1;
     else
         val_size = bufsize;
 
-    memcpy(sp, q->head->value, val_size);
-    sp[val_size - 1] = '\0';
+    /*if sp == NULL, do not copy value to it.*/
+    if (sp) {
+        memcpy(sp, q->head->value, val_size);
+        sp[val_size - 1] = '\0';
+    }
+
     memset(q->head->value, 0, strlen(q->head->value) + 1);
 
     rmvh = q->head;
